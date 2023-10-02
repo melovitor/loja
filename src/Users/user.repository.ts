@@ -5,6 +5,11 @@ import { UserEntity } from './user.entity';
 export class UserRepository {
   private users: UserEntity[] = [];
 
+  private searchId(id: string) {
+    const user = this.users.find((savedUser) => savedUser.id === id);
+    return user;
+  }
+
   async save(user: UserEntity) {
     this.users.push(user);
   }
@@ -19,7 +24,7 @@ export class UserRepository {
   }
 
   async update(id: string, updateData: Partial<UserEntity>) {
-    const user = this.users.find((savedUser) => savedUser.id === id);
+    const user = this.searchId(id);
     if (!user) {
       throw new Error('Usuário não encontrado');
     }
@@ -28,6 +33,13 @@ export class UserRepository {
       if (key === 'id') return;
       user[key] = value;
     });
+
+    return user;
+  }
+
+  async delete(id: string) {
+    const user = this.searchId(id);
+    this.users = this.users.filter((user) => user.id !== id);
 
     return user;
   }
